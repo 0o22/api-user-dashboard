@@ -1,27 +1,23 @@
 'use strict';
 
-module.exports = function (request, reply, done) {
-  const authToken = request.headers.authorization; // TODO Rewrite with cookies
+const { jwtDecode } = require('jwt-decode');
 
-  if (!authToken) {
+module.exports = function (request, reply, done) {
+  const authHeader = request.headers.authorization;
+
+  if (!authHeader) {
     reply.code(401).send({ error: 'Unauthorized' });
 
     return;
   }
 
-  const [, token] = authToken.split(' ');
-  const [, payload] = token.split('.');
-
-  let userData;
+  const token = authHeader.substring(7, authHeader.length);
+  const payload = jwtDecode(token);
 
   try {
-    const payloadDecoded = Buffer.from(payload, 'base64').toString();
-
-    userData = JSON.parse(payloadDecoded);
-
     const currentTime = Math.floor(Date.now() / 1000);
 
-    if (!userData.exp || userData.exp < currentTime) {
+    if (!payload.exp || payload.exp < currentTime) {
       reply.code(401).send({ error: 'Token expired' });
 
       return;
@@ -32,13 +28,13 @@ module.exports = function (request, reply, done) {
     return;
   }
 
-  if (!userData) {
+  if (!payload) {
     reply.code(401).send({ error: 'Unauthorized' });
 
     return;
   }
 
-  if (userData.role !== 'ADMIN') {
+  if (payload.role !== 'ADMIN') {
     reply.code(401).send({ error: 'Unauthorized' });
 
     return;
