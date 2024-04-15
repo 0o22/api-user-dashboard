@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app.js",
-    "lint": "eslint . --ext .js"
+    "lint": "eslint . --ext .js",
+    "prettier": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fastify/autoload": "^5.8.0",
