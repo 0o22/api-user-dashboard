@@ -1,6 +1,7 @@
 'use strict';
 
-const { jwtDecode } = require('jwt-decode');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/env');
 
 module.exports = function (request, reply, done) {
   const authHeader = request.headers.authorization;
@@ -11,17 +12,11 @@ module.exports = function (request, reply, done) {
     return;
   }
 
-  const token = authHeader.substring(7, authHeader.length);
-  const payload = jwtDecode(token);
+  const token = authHeader.substring(7, authHeader.length); // Skip 'Bearer '
+  let payload;
 
   try {
-    const currentTime = Math.floor(Date.now() / 1000);
-
-    if (!payload.exp || payload.exp < currentTime) {
-      reply.code(401).send({ error: 'Token expired' });
-
-      return;
-    }
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (error) {
     reply.code(401).send({ error: 'Unauthorized' });
 

@@ -2,6 +2,7 @@
 
 const { PORT = 3000, JWT_SECRET } = require('./config/env');
 
+// If the environment variable RENDER is set, the application is running on Render.com
 const HOST = 'RENDER' in process.env ? `0.0.0.0` : `localhost`;
 
 const path = require('node:path');

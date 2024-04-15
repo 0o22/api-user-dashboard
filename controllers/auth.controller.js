@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 
 class AuthController {
   async login(request, reply) {
-    const { username, password } = request.body;
+    const { username, password } = request.body || {};
 
     if (!username) {
       reply.code(400).send({ error: 'Username is required' });
@@ -40,7 +40,7 @@ class AuthController {
       const passwordMatch = await bcrypt.compare(password, user.passwordHash);
 
       if (!passwordMatch) {
-        reply.code(400).send({ error: 'Invalid password' });
+        reply.code(400).send({ error: 'Invalid username or password' });
 
         return;
       }
@@ -53,20 +53,20 @@ class AuthController {
     }
 
     const payload = {
-      sub: user.id,
+      id: user.id,
       username: user.username,
       role: user.role,
     };
 
     const token = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: '24h',
+      expiresIn: '15s',
     });
 
     reply.code(200).send({ token });
   }
 
   async register(request, reply) {
-    const { username, password } = request.body;
+    const { username, password } = request.body || {};
 
     if (!username || !password) {
       reply.code(400).send({ error: 'Missing required field(s)' });
