@@ -2,21 +2,35 @@
 
 /**
  * Get validation rules for a given variant
- * @param {number} variant - The variant number
- * @returns {object} - The validation rules
+ * @param {Number} variant - The variant number
+ * @returns {Object} - The validation rules
  */
 function getValidationRules(variant) {
   switch (variant) {
     case 7:
-      return /^(?=.*[0-9])(?=.*[+\-*/]).*$/;
+      return {
+        pattern: /^(?=.*[0-9])(?=.*[+\-*/]).*$/,
+        message:
+          'Password must contain at least one digit and one special character',
+      };
     case 12:
-      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$/;
+      return {
+        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$/,
+        message:
+          'Password must contain at least one lowercase letter, one uppercase letter, and one digit',
+      };
     case 18:
-      return /^(?=.*\d)(?=.*[,.!?])(?=.*[+\-*/]).*$/;
-    case 28:
-      return /^(?:(\p{L})(?!\1)([\p{P}\p{S}])(?!\2)(\d))+$/u;
+      return {
+        pattern: /^(?=.*\d)(?=.*[,.!?])(?=.*[+\-*/]).*$/,
+        message:
+          'Password must contain at least one digit, one punctuation mark, and one operator',
+      };
     default:
-      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$/;
+      return {
+        pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$/,
+        message:
+          'Password must contain at least one digit, one lowercase letter, and one uppercase letter',
+      };
   }
 }
 

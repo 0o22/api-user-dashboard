@@ -74,18 +74,17 @@ class AuthController {
       return;
     }
 
-    if (!USERNAME_REGEX.test(username)) {
+    if (!USERNAME_REGEX.pattern.test(username)) {
       reply.code(400).send({
-        error: 'Username must contain only letters, numbers, and underscores',
+        error: USERNAME_REGEX.message,
       });
 
       return;
     }
 
-    if (!PASSWORD_REGEX.test(password)) {
+    if (!PASSWORD_REGEX.pattern.test(password)) {
       reply.code(400).send({
-        error:
-          'Password must contain at least one number, one special character, and one operator',
+        error: PASSWORD_REGEX.message,
       });
 
       return;
