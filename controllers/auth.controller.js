@@ -59,7 +59,7 @@ class AuthController {
     };
 
     const token = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: '15s',
+      expiresIn: '24h',
     });
 
     reply.code(200).send({ token });
