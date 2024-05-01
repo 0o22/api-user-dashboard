@@ -12,14 +12,14 @@ module.exports = async function (fastify) {
     { preHandler: adminMiddleware },
     userController.deleteUser
   );
-  fastify.patch('/change-password/:username', userController.changePassword);
+  fastify.patch('/:username/change-password', userController.changePassword);
   fastify.patch(
-    '/change-status/:username',
+    '/:username/change-status',
     { preHandler: adminMiddleware },
     userController.changeStatus
   );
   fastify.patch(
-    '/change-password-strictness/:username',
+    '/:username/change-password-strictness',
     { preHandler: adminMiddleware },
     userController.changePasswordStrictness
   );
