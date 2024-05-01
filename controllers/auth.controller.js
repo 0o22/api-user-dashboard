@@ -119,11 +119,13 @@ class AuthController {
       passwordHash,
     };
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: user,
     });
 
-    reply.code(201).send({ message: 'User created successfully' });
+    reply
+      .code(201)
+      .send({ user: newUser, message: 'User created successfully' });
   }
 }
 

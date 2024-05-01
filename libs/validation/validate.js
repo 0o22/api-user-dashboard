@@ -5,7 +5,7 @@ const { validatePasswordVariant18 } = require('./validatePasswordVariant18');
 const { validatePasswordVariant28 } = require('./validatePasswordVariant28');
 const { validatePasswordVariant7 } = require('./validatePasswordVariant7');
 
-const VARIANT = Number(process.env.NEXT_PUBLIC_VARIANT);
+const VARIANT = Number(process.env.VARIANT);
 
 /**
  * @typedef {Object} ValidationResult
@@ -63,6 +63,8 @@ function validatePassword(password) {
       rule: createRuleMessage('alternate letters, punctuation, and numbers'),
     },
   };
+
+  console.log(VARIANT);
 
   if (!rules[VARIANT]) {
     throw new Error('Invalid VARIANT specified.');

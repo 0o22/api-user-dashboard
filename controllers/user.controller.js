@@ -43,7 +43,9 @@ class UserController {
   }
 
   async getAllUsers(request, reply) {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      orderBy: [{ role: 'desc' }, { id: 'asc' }],
+    });
 
     const role = getUserRoleFromRequest(request);
 
@@ -61,7 +63,7 @@ class UserController {
   }
 
   async createUser(request, reply) {
-    const { username } = request.body || {};
+    const { username, strictPassword } = request.body || {};
 
     if (!username) {
       reply.code(400).send({ error: 'Username is required' });
@@ -81,13 +83,16 @@ class UserController {
       return;
     }
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         username,
+        strictPassword,
       },
     });
 
-    reply.code(201).send({ message: 'User created successfully' });
+    reply
+      .code(201)
+      .send({ user: newUser, message: 'User created successfully' });
   }
 
   async deleteUser(request, reply) {
