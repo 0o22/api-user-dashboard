@@ -4,7 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/env');
-const { PASSWORD_REGEX, USERNAME_REGEX } = require('../constants/validators');
+const { validateUsername, validatePassword } = require('../libs/validate');
 
 const prisma = new PrismaClient();
 
@@ -56,6 +56,7 @@ class AuthController {
       id: user.id,
       username: user.username,
       role: user.role,
+      hasPassword: Boolean(user.passwordHash), // Check if user has a password
     };
 
     const token = jwt.sign(payload, JWT_SECRET, {
@@ -74,17 +75,23 @@ class AuthController {
       return;
     }
 
-    if (!USERNAME_REGEX.pattern.test(username)) {
+    const { valid: usernameValid, rule: usernameRule } =
+      validateUsername(username);
+
+    if (!usernameValid) {
       reply.code(400).send({
-        error: USERNAME_REGEX.message,
+        error: usernameRule,
       });
 
       return;
     }
 
-    if (!PASSWORD_REGEX.pattern.test(password)) {
+    const { valid: passwordValid, rule: passwordRule } =
+      validatePassword(password);
+
+    if (!passwordValid) {
       reply.code(400).send({
-        error: PASSWORD_REGEX.message,
+        error: passwordRule,
       });
 
       return;

@@ -2,8 +2,8 @@
 
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
-const { PASSWORD_REGEX } = require('../constants/validators');
 const { getUserRoleFromRequest } = require('../libs/getUserRoleFromRequest');
+const { validatePassword } = require('../libs/validate');
 
 const prisma = new PrismaClient();
 
@@ -156,11 +156,10 @@ class UserController {
       return;
     }
 
-    if (user.strictPassword && !PASSWORD_REGEX.test(newPassword)) {
-      reply.code(400).send({
-        error:
-          'Password must contain at least one number, one special character, and one operator',
-      });
+    const { valid, rule } = validatePassword(newPassword);
+
+    if (user.strictPassword && !valid) {
+      reply.code(400).send({ error: rule });
 
       return;
     }
