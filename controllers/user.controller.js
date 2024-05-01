@@ -185,6 +185,7 @@ class UserController {
 
   async changeStatus(request, reply) {
     const { username } = request.params || {};
+    const { banned } = request.body || {};
 
     const user = await prisma.user.findUnique({
       where: {
@@ -203,7 +204,7 @@ class UserController {
         username,
       },
       data: {
-        banned: !user.banned,
+        banned,
       },
     });
 
@@ -212,6 +213,7 @@ class UserController {
 
   async changePasswordStrictness(request, reply) {
     const { username } = request.params || {};
+    const { strictPassword } = request.body || {};
 
     if (!username) {
       reply.code(400).send({ error: 'Username is required' });
@@ -236,7 +238,7 @@ class UserController {
         username,
       },
       data: {
-        strictPassword: !user.strictPassword,
+        strictPassword,
       },
     });
 
