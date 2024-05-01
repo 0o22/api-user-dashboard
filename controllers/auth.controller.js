@@ -4,7 +4,10 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/env');
-const { validateUsername, validatePassword } = require('../libs/validate');
+const {
+  validateUsername,
+  validatePassword,
+} = require('../libs/validation/validate');
 
 const prisma = new PrismaClient();
 

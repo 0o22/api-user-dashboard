@@ -3,7 +3,7 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const { getUserRoleFromRequest } = require('../libs/getUserRoleFromRequest');
-const { validatePassword } = require('../libs/validate');
+const { validatePassword } = require('../libs/validation/validate');
 
 const prisma = new PrismaClient();
 
