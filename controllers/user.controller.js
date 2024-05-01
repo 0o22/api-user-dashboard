@@ -156,7 +156,7 @@ class UserController {
     const passwordMatch = await bcrypt.compare(password, user.passwordHash);
 
     if (!passwordMatch) {
-      reply.code(400).send({ error: 'Invalid username or password' });
+      reply.code(400).send({ error: 'Invalid password' });
 
       return;
     }
