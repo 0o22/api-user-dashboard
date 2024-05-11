@@ -47,6 +47,8 @@ class UserController {
       orderBy: [{ role: 'desc' }, { id: 'asc' }],
     });
 
+    console.log(users);
+
     const role = getUserRoleFromRequest(request);
 
     if (role === 'ADMIN') {
