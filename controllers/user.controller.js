@@ -2,6 +2,7 @@
 
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
+const { calculateVerification } = require('../libs/calculateVerification');
 const { getUserRoleFromRequest } = require('../libs/getUserRoleFromRequest');
 const { validatePassword } = require('../libs/validation/validate');
 
@@ -65,7 +66,17 @@ class UserController {
   }
 
   async createUser(request, reply) {
-    const { username, strictPassword } = request.body || {};
+    const {
+      username,
+      strictPassword,
+      verification: { a, x, result },
+    } = request.body;
+
+    if (result !== calculateVerification(a, x)) {
+      reply.code(401).send({ error: 'Unauthorized' });
+
+      return;
+    }
 
     if (!username) {
       reply.code(400).send({ error: 'Username is required' });
@@ -127,9 +138,59 @@ class UserController {
     reply.code(204).send({ message: 'User deleted successfully' });
   }
 
+  async setNewPassword(request, reply) {
+    const { username } = request.params;
+    const { newPassword } = request.body;
+
+    if (!username || !newPassword) {
+      reply.code(400).send({ error: 'Missing required field(s)' });
+
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!user) {
+      reply.code(404).send({ error: 'User not found' });
+
+      return;
+    }
+
+    if (user.passwordHash) {
+      reply.code(400).send({ error: 'User already has a password' });
+
+      return;
+    }
+
+    const { valid, rule } = validatePassword(newPassword);
+
+    if (user.strictPassword && !valid) {
+      reply.code(400).send({ error: rule });
+
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: {
+        username,
+      },
+      data: {
+        passwordHash,
+      },
+    });
+
+    reply.code(204).send({ message: 'Password changed successfully' });
+  }
+
   async changePassword(request, reply) {
-    const { username } = request.params || {};
-    const { password, newPassword } = request.body || {};
+    const { username } = request.params;
+    const { password, newPassword } = request.body;
 
     if (!username || !password || !newPassword) {
       reply.code(400).send({ error: 'Missing required field(s)' });
@@ -186,8 +247,8 @@ class UserController {
   }
 
   async changeStatus(request, reply) {
-    const { username } = request.params || {};
-    const { banned } = request.body || {};
+    const { username } = request.params;
+    const { banned } = request.body;
 
     const user = await prisma.user.findUnique({
       where: {
@@ -214,8 +275,8 @@ class UserController {
   }
 
   async changePasswordStrictness(request, reply) {
-    const { username } = request.params || {};
-    const { strictPassword } = request.body || {};
+    const { username } = request.params;
+    const { strictPassword } = request.body;
 
     if (!username) {
       reply.code(400).send({ error: 'Username is required' });

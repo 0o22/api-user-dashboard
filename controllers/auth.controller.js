@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 
 class AuthController {
   async login(request, reply) {
-    const { username, password } = request.body || {};
+    const { username, password } = request.body;
 
     if (!username) {
       reply.code(400).send({ error: 'Username is required' });
@@ -72,7 +72,7 @@ class AuthController {
   }
 
   async register(request, reply) {
-    const { username, password } = request.body || {};
+    const { username, password } = request.body;
 
     if (!username || !password) {
       reply.code(400).send({ error: 'Missing required field(s)' });
