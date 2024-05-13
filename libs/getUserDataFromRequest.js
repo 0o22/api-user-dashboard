@@ -4,15 +4,15 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/env');
 
 /**
- * Extracts the role from the JWT in the Authorization header.
+ * Extracts the data from the JWT in the Authorization header.
  * @param {Object} request - The request object from Fastify or another framework.
- * @returns {String} The role of the user, or 'USER' if the role cannot be determined.
+ * @returns {Object} The data of the user extracted from the JWT.
  */
-function getUserRoleFromRequest(request) {
+function getUserDataFromRequest(request) {
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
-    return 'USER'; // Default to 'USER' if no authorization header is present
+    return null;
   }
 
   const token = authHeader.substring(7); // Skip 'Bearer '
@@ -20,10 +20,10 @@ function getUserRoleFromRequest(request) {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
 
-    return payload.role || 'USER';
+    return payload;
   } catch (error) {
-    return 'USER';
+    return null;
   }
 }
 
-module.exports = { getUserRoleFromRequest };
+module.exports = { getUserDataFromRequest };

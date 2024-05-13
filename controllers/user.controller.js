@@ -3,7 +3,7 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const { calculateVerification } = require('../libs/calculateVerification');
-const { getUserRoleFromRequest } = require('../libs/getUserRoleFromRequest');
+const { getUserDataFromRequest } = require('../libs/getUserDataFromRequest');
 const { validatePassword } = require('../libs/validation/validate');
 
 const prisma = new PrismaClient();
@@ -30,16 +30,22 @@ class UserController {
       return;
     }
 
-    const role = getUserRoleFromRequest(request);
+    const minimalUser = {
+      id: user.id,
+      username: user.username,
+      banned: user.banned,
+    };
 
-    if (role === 'ADMIN') {
+    const data = getUserDataFromRequest(request);
+
+    if (!data) {
+      return reply.code(200).send(minimalUser);
+    }
+
+    if (data.role === 'ADMIN' || data.username === username) {
       return reply.code(200).send(user);
     } else {
-      return reply.code(200).send({
-        id: user.id,
-        username: user.username,
-        banned: user.banned,
-      });
+      return reply.code(200).send(minimalUser);
     }
   }
 
@@ -50,9 +56,9 @@ class UserController {
 
     console.log(users);
 
-    const role = getUserRoleFromRequest(request);
+    const data = getUserDataFromRequest(request);
 
-    if (role === 'ADMIN') {
+    if (data.role === 'ADMIN') {
       return reply.code(200).send(users);
     } else {
       const filteredUsers = users.map(({ id, username, banned }) => ({
