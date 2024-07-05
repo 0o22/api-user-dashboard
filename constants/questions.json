@@ -1,0 +1,84 @@
+{
+  "questions": [
+    {
+      "question": "What is the capital of Canada?",
+      "correctAnswer": "Ottawa"
+    },
+    {
+      "question": "What is 10 x 10?",
+      "correctAnswer": "100"
+    },
+    {
+      "question": "What is the boiling point of water in degrees Celsius?",
+      "correctAnswer": "100"
+    },
+    {
+      "question": "What is the tallest animal in the world?",
+      "correctAnswer": "Giraffe"
+    },
+    {
+      "question": "What is the main ingredient in bread?",
+      "correctAnswer": "Flour"
+    },
+    {
+      "question": "Who was the first president of the United States?",
+      "correctAnswer": "George Washington"
+    },
+    {
+      "question": "What is the currency of Japan?",
+      "correctAnswer": "Yen"
+    },
+    {
+      "question": "How many planets are in the solar system?",
+      "correctAnswer": "8"
+    },
+    {
+      "question": "What is the largest internal organ in the human body?",
+      "correctAnswer": "Liver"
+    },
+    {
+      "question": "Who wrote 'The Odyssey'?",
+      "correctAnswer": "Homer"
+    },
+    {
+      "question": "What is the capital of Australia?",
+      "correctAnswer": "Canberra"
+    },
+    {
+      "question": "How many strings does a standard guitar have?",
+      "correctAnswer": "6"
+    },
+    {
+      "question": "What is the capital of Egypt?",
+      "correctAnswer": "Cairo"
+    },
+    {
+      "question": "How many degrees are in a circle?",
+      "correctAnswer": "360"
+    },
+    {
+      "question": "What is the national animal of Canada?",
+      "correctAnswer": "Beaver"
+    },
+    {
+      "question": "Who discovered penicillin?",
+      "correctAnswer": "Alexander Fleming"
+    },
+    {
+      "question": "What is the largest land animal?",
+      "correctAnswer": "Elephant"
+    },
+    {
+      "question": "What is the name of the closest star to Earth?",
+      "correctAnswer": "The Sun"
+    },
+    {
+      "question": "What is the name of the ship that brought the Pilgrims to America?",
+      "correctAnswer": "Mayflower"
+    },
+    {
+      "question": "What is the most popular sport in the world?",
+      "correctAnswer": "Soccer"
+    }
+  ]
+}
