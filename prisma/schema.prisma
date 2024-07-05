@@ -15,7 +15,7 @@ model User {
   strictPassword Boolean  @default(true)
   banned         Boolean  @default(false)
   role           Role     @default(USER)
-  access         Access   @default(LIMITED)
+  access         Access   @default(NONE)
 }
 
 enum Role {
