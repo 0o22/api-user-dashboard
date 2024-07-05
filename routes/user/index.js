@@ -12,6 +12,7 @@ module.exports = async function (fastify) {
     { preHandler: adminMiddleware },
     userController.deleteUser
   );
+  fastify.post('/:username/check-access', userController.checkAccess);
   fastify.patch('/:username/set-new-password', userController.setNewPassword);
   fastify.patch('/:username/change-password', userController.changePassword);
   fastify.patch(
@@ -24,4 +25,5 @@ module.exports = async function (fastify) {
     { preHandler: adminMiddleware },
     userController.changePasswordStrictness
   );
+  fastify.post('/verify-access-key', userController.verifyAccess);
 };

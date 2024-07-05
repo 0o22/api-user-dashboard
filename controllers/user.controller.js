@@ -1,10 +1,11 @@
 'use strict';
 
+const { getUserDataFromRequest } = require('../libs/getUserDataFromRequest');
+const { calculateVerification } = require('../libs/calculateVerification');
+const { validatePassword } = require('../libs/validation/validatePassword');
+const { verifyAccessKey } = require('../libs/verifyAccessKey');
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
-const { calculateVerification } = require('../libs/calculateVerification');
-const { getUserDataFromRequest } = require('../libs/getUserDataFromRequest');
-const { validatePassword } = require('../libs/validation/validate');
 
 const prisma = new PrismaClient();
 
@@ -53,8 +54,6 @@ class UserController {
     const users = await prisma.user.findMany({
       orderBy: [{ role: 'desc' }, { id: 'asc' }],
     });
-
-    console.log(users);
 
     const data = getUserDataFromRequest(request);
 
@@ -142,6 +141,122 @@ class UserController {
     });
 
     reply.code(204).send({ message: 'User deleted successfully' });
+  }
+
+  async checkAccess(request, reply) {
+    const { username } = request.params;
+
+    if (!username) {
+      reply.code(400).send({ error: 'Missing username' });
+
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!user) {
+      reply.code(404).send({ error: 'User not found' });
+
+      return;
+    }
+
+    const data = getUserDataFromRequest(request);
+
+    if (data.username !== username) {
+      reply.code(401).send({ error: 'Unauthorized' });
+
+      return;
+    }
+
+    if (user.access === 'FULL') {
+      reply.code(200).send({ message: 'Access granted' });
+
+      return;
+    }
+
+    if (user.access === 'NONE') {
+      reply.code(403).send({ error: 'Access denied' });
+
+      return;
+    }
+
+    const expirationDuration = 7; //* in days
+    const creationDate = new Date(user.createdAt);
+    const expirationTime = creationDate.setDate(
+      creationDate.getDate() + expirationDuration
+    );
+
+    const now = Date.now();
+
+    if (now > expirationTime) {
+      await prisma.user.update({
+        where: {
+          username,
+        },
+        data: {
+          access: 'NONE',
+        },
+      });
+
+      reply.code(403).send({ error: 'Access expired' });
+
+      return;
+    }
+
+    reply.code(200).send({ message: 'Access granted' });
+  }
+
+  async verifyAccess(request, reply) {
+    const { key } = request.body;
+
+    const data = getUserDataFromRequest(request);
+
+    if (!data) {
+      reply.code(401).send({ error: 'Unauthorized' });
+
+      return;
+    }
+
+    if (!data.username) {
+      reply.code(400).send({ error: 'Missing username' });
+
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        username: data.username,
+      },
+    });
+
+    if (!user) {
+      reply.code(404).send({ error: 'User not found' });
+
+      return;
+    }
+
+    const isVerified = verifyAccessKey(key, user.username);
+
+    if (!isVerified) {
+      reply.code(403).send({ error: 'Access denied' });
+
+      return;
+    }
+
+    await prisma.user.update({
+      where: {
+        username: data.username,
+      },
+      data: {
+        access: 'FULL',
+      },
+    });
+
+    reply.code(204).send({ message: 'Access granted' });
   }
 
   async setNewPassword(request, reply) {

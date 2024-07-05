@@ -1,13 +1,13 @@
 'use strict';
 
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { validateUsername } = require('../libs/validation/validateUsername');
+const { validatePassword } = require('../libs/validation/validatePassword');
+const { getQuestionsWithAnswers } = require('../libs/getQuestionsWithAnswers');
+const { checkResponses } = require('../libs/checkResponses');
 const { JWT_SECRET } = require('../config/env');
-const {
-  validateUsername,
-  validatePassword,
-} = require('../libs/validation/validate');
+const { PrismaClient } = require('@prisma/client');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
@@ -61,7 +61,7 @@ class AuthController {
       role: user.role,
       access: user.access,
       createdAt: user.createdAt,
-      hasPassword: Boolean(user.passwordHash), // Check if user has a password
+      hasPassword: user.passwordHash !== null,
     };
 
     const token = jwt.sign(payload, JWT_SECRET, {
@@ -128,6 +128,34 @@ class AuthController {
     reply
       .code(201)
       .send({ user: newUser, message: 'User created successfully' });
+  }
+
+  async getQuestions(_, reply) {
+    const questionsWithAnswers = getQuestionsWithAnswers();
+
+    const sliceEnd = 4;
+
+    const questions = questionsWithAnswers.map(({ question }) => ({
+      question,
+    }));
+
+    const shuffledQuestions = questions.slice(0, sliceEnd);
+
+    return reply.code(200).send(shuffledQuestions);
+  }
+
+  async checkAnswers(request, reply) {
+    const { responses } = request.body;
+
+    const questionsWithAnswers = getQuestionsWithAnswers();
+
+    const isCorrect = checkResponses(questionsWithAnswers, responses);
+
+    if (!isCorrect) {
+      return reply.code(400).send({ error: 'Answers are incorrect' });
+    }
+
+    return reply.code(200).send({ message: 'Answers are correct' });
   }
 }
 

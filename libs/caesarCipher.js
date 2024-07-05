@@ -8,15 +8,27 @@
  */
 function caesarCipher(charset, encode = true) {
   const shift = 3;
-  const direction = encode ? 1 : -1;
+  const { length } = charset;
+  let result = '';
 
-  return charset.replace(/[a-z]/gi, (char) => {
-    let startCode = char <= 'Z' ? 65 : 97;
+  for (let i = 0; i < length; i++) {
+    const char = charset[i];
+    const charCode = charset.charCodeAt(i);
 
-    return String.fromCharCode(
-      ((char.charCodeAt(0) + shift * direction - startCode) % 26) + startCode
-    );
-  });
+    if (charCode >= 65 && charCode <= 90) {
+      result += String.fromCharCode(
+        ((charCode - 65 + (encode ? shift : 26 - shift)) % 26) + 65
+      );
+    } else if (charCode >= 97 && charCode <= 122) {
+      result += String.fromCharCode(
+        ((charCode - 97 + (encode ? shift : 26 - shift)) % 26) + 97
+      );
+    } else {
+      result += char;
+    }
+  }
+
+  return result;
 }
 
 module.exports = { caesarCipher };
